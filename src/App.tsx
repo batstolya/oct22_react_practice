@@ -136,7 +136,9 @@ export const App: React.FC = () => {
                   <button
                     data-cy="ClearButton"
                     type="button"
-                    className="delete"
+                    className={classNames('delete',
+                      { 'none' : text === '',
+                      })}
                     onClick={clearHandler}
                   />
                 </span>
