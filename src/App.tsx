@@ -6,24 +6,11 @@ import usersFromServer from './api/users';
 import productsFromServer from './api/products';
 import categoriesFromServer from './api/categories';
 
-// interface User {
-//   id: number;
-//   name: string;
-//   sex: string;
-// }
-
 interface Product {
   id: number;
   name: string;
   categoryId: number;
 }
-
-// interface Categories {
-//   id: number;
-//   title: string;
-//   icon: string;
-//   ownerId: number;
-// }
 
 const getCategoryWithUser = categoriesFromServer.map((category) => ({
   ...category,
@@ -42,14 +29,15 @@ export const App: React.FC = () => {
   const [selected, setSelected] = useState('all');
   const [text, setText] = useState('');
 
-  const filterByName = (id:number) => {
+  const filterByName = (id:number | string) => {
     const categoryByUser = preparedProducts.filter(
       (product) => product.category?.ownerId === id,
     );
 
     const findSelectedUser = usersFromServer.find((user) => user.id === id);
+    const c = findSelectedUser ? findSelectedUser.id : '';
 
-    setSelected(findSelectedUser.id);
+    setSelected(c.toString());
     setProducts(categoryByUser);
   };
 
@@ -137,8 +125,7 @@ export const App: React.FC = () => {
                     data-cy="ClearButton"
                     type="button"
                     className={classNames('delete',
-                      { 'none' : text === '',
-                      })}
+                      { none: text === '' })}
                     onClick={clearHandler}
                   />
                 </span>
@@ -250,8 +237,15 @@ export const App: React.FC = () => {
             <tbody>
               {products.map((product) => {
                 const { id, name, category } = product;
+
+                const myCategory = category ? category.user?.sex : '';
+                const myCategoryIcon = category ? category.icon : '';
+                const myCategoryTitle = category ? category.title : '';
+                const categoryUserName = category && category.user
+                  ? category?.user.name : '';
+
                 const sex
-                  = category.user?.sex === 'm'
+                  = myCategory === 'm'
                     ? 'has-text-link'
                     : 'has-text-danger';
 
@@ -262,10 +256,10 @@ export const App: React.FC = () => {
                     </td>
 
                     <td data-cy="ProductName">{name}</td>
-                    <td data-cy="ProductCategory">{`${category.icon} - ${category.title}`}</td>
+                    <td data-cy="ProductCategory">{`${myCategoryIcon} - ${myCategoryTitle}`}</td>
 
                     <td data-cy="ProductUser" className={sex}>
-                      {category?.user.name}
+                      {categoryUserName}
                     </td>
                   </tr>
                 );
